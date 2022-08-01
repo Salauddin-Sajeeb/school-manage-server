@@ -40,6 +40,8 @@ require("./app/api/academicCalender")(app);
 require("./app/api/school_admin")(app);
 require("./app/api/super_admin")(app);
 require("./app/api/exam.marks")(app);
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+
+const server = app.listen(PORT, () => {
+  const port = server.address().port;
+  console.log(`Express is working on port ${port}`);
+}); 
