@@ -38,7 +38,7 @@ module.exports = (app) => {
     });
   });
   app.get("/api/notice/creator", (req, res) => {
-    var sql = `select notice.id, notice.school_info_id, session.session_year, notice.section_id, class.class_name,  notice.notice_headline, notice.notice_description, notice.publishing_date
+    var sql = `select notice.id, notice.school_info_id, session.session_year, notice.section_id, class.class_name,  notice.notice_headline, notice.notice_description, notice.publishing_date,section.section_default_name
     from notice
     join class on notice.class_id=class.id 
     join section on notice.section_id=section.id
@@ -61,13 +61,12 @@ module.exports = (app) => {
     });
   });
   app.get("/api/notice/student", authenticateToken, (req, res) => {
-    var sql = `select notice.id, notice.school_info_id, session.session_year, notice.section_id, class.class_name,  notice.notice_headline, notice.notice_description, notice.publishing_date
-    from notice
-    join class on notice.class_id=class.id 
-    join section on notice.section_id=section.id
-    join session on notice.session_id=session.id
-    where notice.student_id="${req.query.student_id}"
-    order by notice.id
+    var sql = `select notice_user.id,notice_user.type, session.session_year, notice_user.notice_headline, notice_user.notice_description, notice_user.publishing_date,student.student_code
+    from notice_user
+   join student on notice_user.student_id=student.id
+    join session on notice_user.session_id=session.id
+    where notice_user.student_id="${req.query.student_id}" and notice_user.type= "${req.query.type}"
+    order by notice_user.id
     ;`;
     con.query(sql, function (err, result, fields) {
       if (err) throw err;
@@ -161,17 +160,31 @@ module.exports = (app) => {
     var description = req.body.description;
     var date = req.body.date;
     var uid = req.body.uid;
+    var type = req.body.type;
 
-    var sql =
-      "INSERT INTO `notice` (`session_id`, `school_info_id`, `class_id`, `section_id`, `student_id`, `notice_headline`, `notice_description`, `publishing_date`, `user_code`) VALUES ";
+
+
+    var sql = `INSERT INTO notice (session_id, school_info_id, class_id, section_id,  notice_headline, notice_description, publishing_date, user_code,type) VALUES ("${session_id}", "${school_info_id}", "${class_id}", "${section_id}", "${headline}", "${description}", "${date}", "${uid}","${type}") `;
+
+    var sql2 = "INSERT INTO `notice_user` (session_id,student_id,notice_headline, notice_description, publishing_date, user_code,type) VALUES "
     students.map((st_id) => {
-      sql += `("${session_id}", "${school_info_id}", "${class_id}", "${section_id}", "${st_id}", "${headline}", "${description}", "${date}", "${uid}"),`;
+      sql2 += `("${session_id}", "${st_id}","${headline}","${description}","${date}","${uid}","${type}"),`;
     });
-    sql = sql.slice(0, -1);
+    sql2 = sql2.slice(0, -1);
 
     con.query(sql, function (err, result, fields) {
       if (err) throw err;
+      if (!err) {
+        con.query(sql2, function (err, result, field) {
+
+          if (err) throw err;
+          res.json({ status: "success" })
+        })
+
+      }
       res.json({ status: "success" });
     });
+
+
   });
 };
