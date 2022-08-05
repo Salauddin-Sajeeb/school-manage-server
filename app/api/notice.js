@@ -24,12 +24,12 @@ module.exports = (app) => {
     });
   });
   app.get("/api/notice/school", authenticateToken, (req, res) => {
-    var sql = `select notice.id, notice.school_info_id, session.session_year, notice.section_id, class.class_name,notice.student_id,  notice.notice_headline, notice.notice_description, notice.publishing_date,section.section_default_name
+    var sql = `select notice.id, notice.school_info_id, session.session_year,notice.type, notice.section_id, class.class_name,  notice.notice_headline, notice.notice_description, notice.publishing_date,section.section_default_name
     from notice
     join class on notice.class_id=class.id 
     join section on notice.section_id=section.id
     join session on notice.session_id=session.id
-    where notice.school_info_id="${req.query.school_info_id}"
+    where notice.school_info_id="${req.query.school_info_id}" and notice.type="${req.query.type}"
     order by notice.id
     ;`;
     con.query(sql, function (err, result, fields) {

@@ -18,6 +18,6 @@ con.connect((err) => {
 });
 setInterval(function () {
   con.query('SELECT 1');
-}, 5000);
+}, 33000);
 
 module.exports = con;
