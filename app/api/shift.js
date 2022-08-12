@@ -16,4 +16,10 @@ module.exports = (app) => {
       res.send(result);
     });
   });
+  app.get("/api/groups/all", authenticateToken, (req, res) => {
+    con.query("SELECT * FROM group", function (err, result, fields) {
+      if (err) throw err;
+      res.send(result);
+    });
+  });
 };

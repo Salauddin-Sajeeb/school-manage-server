@@ -12,7 +12,7 @@ module.exports = (app) => {
   });
   app.get("/api/subjects", authenticateToken, (req, res) => {
     con.query(
-      `SELECT id, subject_name FROM subject where class_id="${req.query.class_id}"`,
+      `SELECT id, subject_name FROM subject where subject.class_id="${req.query.class_id}"`,
       function (err, result, fields) {
         if (err) throw err;
         res.send(result);
